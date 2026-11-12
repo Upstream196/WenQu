@@ -1,13 +1,40 @@
-"*.vue"    eol=lf
-"*.js"     eol=lf
-"*.ts"     eol=lf
-"*.jsx"    eol=lf
-"*.tsx"    eol=lf
-"*.mjs"    eol=lf
-"*.json"   eol=lf
-"*.html"   eol=lf
-"*.css"    eol=lf
-"*.scss"   eol=lf
-"*.md"     eol=lf
-"*.yaml"   eol=lf
-"*.yml"    eol=lf
+# 1. 自动处理所有文本文件
+* text=auto
+
+# 2. 后端代码和配置文件（Java 生态）
+*.java text eol=lf
+*.xml  text eol=lf
+*.properties text eol=lf
+*.sql  text eol=lf
+*.sh   text eol=lf
+
+# 3. 前端代码和配置文件（统一 LF）
+*.vue  text eol=lf
+*.js   text eol=lf
+*.ts   text eol=lf
+*.jsx  text eol=lf
+*.tsx  text eol=lf
+*.mjs  text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.css  text eol=lf
+*.scss text eol=lf
+*.md   text eol=lf
+*.yaml text eol=lf
+*.yml  text eol=lf
+
+
+# 4. Windows专属脚本，强制 CRLF（防止在 Windows 下执行报错）
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 5. 明确告诉 Git 哪些是二进制文件，不要瞎转（防止图片或 jar 包损坏）
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.jar  binary
+*.war  binary
+*.zip  binary
+*.pdf  binary
