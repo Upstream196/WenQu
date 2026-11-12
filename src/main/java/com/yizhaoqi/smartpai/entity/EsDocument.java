@@ -2,6 +2,8 @@ package com.yizhaoqi.smartpai.entity;
 
 
 import lombok.Data;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 /**
  * Elasticsearch存储的文档实体类
@@ -14,7 +16,8 @@ public class EsDocument {
     private String fileMd5;        // 文件指纹
     private Integer chunkId;       // 文本分块序号
     private String textContent;    // 文本内容
-    private float[] vector;        // 向量数据（768维）
+    @Field(type = FieldType.Dense_Vector, dims = 2048)
+    private float[] vector;        // 向量数据（768维） -> 暂改为2048
     private String modelVersion;   // 向量生成模型版本
     private String userId;         // 上传用户ID
     private String orgTag;         // 组织标签

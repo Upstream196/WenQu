@@ -1,4 +1,4 @@
-package com.yizhaoqi.smartpai.benchmark;
+package com.yizhaoqi.smartpai.benchmark.Original;
 
 import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.CategoryChart;
@@ -29,10 +29,10 @@ public class ChartGenerator {
     private static final String CHART_DIR = "target/benchmark-reports/charts";
 
     public static String generateAll(MetricsCollector.Summary pureSummary,
-                                      MetricsCollector.Summary hybridSummary,
-                                      List<MetricsCollector.QueryMetrics> pureRecords,
-                                      List<MetricsCollector.QueryMetrics> hybridRecords,
-                                      String pureName, String hybridName) throws IOException {
+                                     MetricsCollector.Summary hybridSummary,
+                                     List<MetricsCollector.QueryMetrics> pureRecords,
+                                     List<MetricsCollector.QueryMetrics> hybridRecords,
+                                     String pureName, String hybridName) throws IOException {
         Files.createDirectories(Paths.get(CHART_DIR));
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
 

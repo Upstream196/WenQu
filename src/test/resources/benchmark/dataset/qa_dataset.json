@@ -1,0 +1,13 @@
+[
+  {
+    "qid": "q1",
+    "query": "",
+    "gold_chunk_ids": ["", ""]
+  },
+
+  {
+    "qid": "q2",
+    "query": "",
+    "gold_chunk_ids": ["", ""]
+  }
+]

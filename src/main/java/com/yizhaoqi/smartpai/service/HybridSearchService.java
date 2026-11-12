@@ -83,7 +83,8 @@ public class HybridSearchService {
 
             logger.debug("向量生成成功，开始执行混合搜索 KNN");
 
-            SearchResponse<EsDocument> response = esClient.search(s -> {
+            SearchResponse<EsDocument> response = esClient.search
+                    (s -> {
                         s.index("knowledge_base");
                         // KNN 召回
                         int recallK = topK * 30; // KNN 召回窗口
@@ -94,9 +95,11 @@ public class HybridSearchService {
                                 .numCandidates(recallK)
                         );
                         // 必须命中关键词 + 权限过滤
-                        s.query(q -> q.bool(b -> b
-                                .must(mst -> mst.match(m -> m.field("textContent").query(query)))
-                                .filter(f -> f.bool(bf -> bf
+                        s.query(q -> q.bool(
+                                b -> b
+                                .should(s0 -> s0.match(m -> m.field("textContent").query(query)))
+                                .filter(f -> f.bool(
+                                        bf -> bf
                                         // 条件1: 用户可访问自己的文档
                                         .should(s1 -> s1.term(t -> t.field("userId").value(userDbId)))
                                         // 条件2: 公开文档
@@ -172,9 +175,19 @@ public class HybridSearchService {
     }
 
     /**
+     * 评估专用：仅使用文本匹配的带权限搜索（对外暴露）
+     */
+    public List<SearchResult> textOnlySearchWithPermission(String query, String userId, int topK) {
+        // 内部自动获取权限信息，复用原有的 private 方法
+        List<String> userEffectiveTags = getUserEffectiveOrgTags(userId);
+        String userDbId = getUserDbId(userId);
+        return textOnlySearchWithPermission(query, userDbId, userEffectiveTags, topK);
+    }
+
+    /**
      * 仅使用文本匹配的带权限搜索方法
      */
-    private List<SearchResult> textOnlySearchWithPermission(String query, String userDbId, List<String> userEffectiveTags, int topK) {
+   public List<SearchResult> textOnlySearchWithPermission(String query, String userDbId, List<String> userEffectiveTags, int topK) {
         try {
             logger.debug("开始执行纯文本搜索，用户数据库ID: {}, 标签: {}", userDbId, userEffectiveTags);
 

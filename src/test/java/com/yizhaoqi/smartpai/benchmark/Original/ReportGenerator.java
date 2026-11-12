@@ -1,4 +1,4 @@
-package com.yizhaoqi.smartpai.benchmark;
+package com.yizhaoqi.smartpai.benchmark.Original;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,8 +24,8 @@ public class ReportGenerator {
      * @return 报告文件路径
      */
     public static Path generate(MetricsCollector.Summary pureSummary,
-                                 MetricsCollector.Summary hybridSummary,
-                                 String pureName, String hybridName) throws IOException {
+                                MetricsCollector.Summary hybridSummary,
+                                String pureName, String hybridName) throws IOException {
         Files.createDirectories(Paths.get(REPORT_DIR));
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         Path filePath = Paths.get(REPORT_DIR, "benchmark-report_" + timestamp + ".md");

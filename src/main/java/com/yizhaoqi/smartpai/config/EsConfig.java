@@ -35,7 +35,7 @@ public class EsConfig {
     @Value("${elasticsearch.username:elastic}")
     private String username;
 
-    @Value("${elasticsearch.password:changeme}")
+    @Value("${elasticsearch.password:PaiSmart2025}")
     private String password;
 
     @Bean
@@ -46,6 +46,9 @@ public class EsConfig {
         // 设置基本认证
         if (username != null && !username.isEmpty()) {
             BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
+            // 在你 new UsernamePasswordCredentials 之前加上这行！
+            System.out.println("======== 当前使用的 ES 用户名: [" + username + "] 密码: [" + password + "] ========");
+
             credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
             builder.setHttpClientConfigCallback(httpClientBuilder -> {
                 // 忽略 TLS 证书（仅限开发环境）

@@ -1,4 +1,4 @@
-package com.yizhaoqi.smartpai.benchmark;
+package com.yizhaoqi.smartpai.benchmark.Original;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.yizhaoqi.smartpai.client.EmbeddingClient;

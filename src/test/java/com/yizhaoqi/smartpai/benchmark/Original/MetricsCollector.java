@@ -1,4 +1,4 @@
-package com.yizhaoqi.smartpai.benchmark;
+package com.yizhaoqi.smartpai.benchmark.Original;
 
 import java.util.*;
 import java.util.stream.Collectors;

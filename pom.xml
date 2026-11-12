@@ -182,6 +182,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!--新增Spring Data Elasticsearch依赖用于测试-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
