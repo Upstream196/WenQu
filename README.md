@@ -1,14 +1,16 @@
-# PaiSmart 派聪明
+# 问渠 WenQu · 企业级智能知识问答系统
 
-企业级 AI 知识库问答系统，基于检索增强生成（RAG）：用户上传文档 → 解析分块 → 向量化入库 → 用自然语言提问，系统检索相关片段并交由大模型生成有据可依的回答。
+> 问渠那得清如许，为有源头活水来。—— 朱熹《观书有感》
+
+企业知识常常"存得进去、找不出来"：制度散在网盘、手册埋在群文件、老员工的经验只留在聊天记录里。
+
+问渠把散落的文档变成可对话的知识库：上传即入库，提问即检索，每个回答都附上它依据的原文片段——而不是一段无法追责的即兴发挥。
 
 - 后端：Spring Boot 3.4.2 / Java 17
 - 前端：Vue 3 + TypeScript + Naive UI
 - 检索：Elasticsearch 8.10（dense_vector 向量召回 + IK 分词关键词检索，混合排序）
 - 异步流水线：Kafka + Apache Tika + MinIO
 - 大模型：DeepSeek（chat），DashScope `text-embedding-v4`（2048 维）
-
-> 本项目为学习用途的二次开发，遵循仓库根目录 `LICENSE`（Apache-2.0）。
 
 ## 功能特性
 
@@ -56,7 +58,7 @@
 ## 目录结构
 
 ```
-PaiSmart/
+WenQu/
 ├── src/main/java/com/yizhaoqi/smartpai/
 │   ├── client/        # DeepSeek、Embedding 等外部 API 客户端
 │   ├── config/        # 安全、Kafka、ES、MinIO 等配置
@@ -171,4 +173,4 @@ pnpm dev
 
 ## License
 
-[Apache-2.0](LICENSE)
+[Apache-2.0](LICENSE)。第三方组件与衍生代码的版权声明见仓库 `LICENSE` 文件，保留原始许可要求。
