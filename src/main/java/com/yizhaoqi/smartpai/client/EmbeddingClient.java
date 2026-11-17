@@ -77,8 +77,11 @@ public class EmbeddingClient {
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(String.class)
-                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)) // 重试3次，每次间隔1秒
-                        .filter(e -> e instanceof WebClientResponseException))
+                // 关键修改：捕获网络异常，并使用指数退避重试机制
+                .retryWhen(Retry.backoff(3, Duration.ofSeconds(2)) // 重试 3 次，初始等待 2 秒
+                        .filter(throwable -> throwable instanceof org.springframework.web.reactive.function.client.WebClientRequestException ||
+                                throwable instanceof WebClientResponseException.TooManyRequests ||
+                                throwable instanceof WebClientResponseException.InternalServerError))
                 .block(Duration.ofSeconds(30));
     }
 

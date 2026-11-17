@@ -28,6 +28,9 @@ public class DocumentVector {
 
     @Column(length = 32)
     private String modelVersion;
+
+    @Column(name = "page_number")
+    private Integer pageNumber;
     
     /**
      * 上传用户ID

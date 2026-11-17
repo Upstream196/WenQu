@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import com.hankcs.hanlp.seg.common.Term;
@@ -27,6 +30,9 @@ public class ParseService {
 
     @Autowired
     private DocumentVectorRepository documentVectorRepository;
+
+    @Autowired
+    private LiteParseService liteParseService;
 
     @Value("${file.parsing.chunk-size}")
     private int chunkSize;
@@ -95,6 +101,83 @@ public class ParseService {
     }
 
     /**
+     * 新增重载方法，根据文件名进行分流
+     * @param fileMd5
+     * @param fileStream
+     * @param fileName
+     * @param userId
+     * @param orgTag
+     * @param isPublic
+     * @throws Exception
+     */
+    public void parseAndSave(String fileMd5, InputStream fileStream, String fileName,
+                             String userId, String orgTag, boolean isPublic) throws Exception {
+        if(fileName != null && fileName.toLowerCase().endsWith(".pdf")) {
+            logger.info("检测到 PDF 文件，启动 LiteParse 解析链路，fileMd5：{}", fileMd5);
+            parsePdfWithLiteParse(fileMd5,fileStream,userId,orgTag,isPublic);
+        } else{
+            //非 PDF走原有Tika流程
+            parseAndSave(fileMd5,fileStream,userId,orgTag,isPublic);
+        }
+
+    }
+
+    private void parsePdfWithLiteParse(String fileMd5, InputStream fileStream,
+                                       String userId, String orgTag, boolean isPublic) throws Exception{
+        //1. 落盘为临时 PDF
+        Path tempPdf = Files.createTempFile("liteparse-in-", ".pdf");
+        try {
+            Files.copy(fileStream, tempPdf, StandardCopyOption.REPLACE_EXISTING);
+
+            // 2. 调用 LiteParse
+            List<LiteParseService.ParsePage> pages = liteParseService.parsePdf(tempPdf.toFile());
+
+            //3. 按也切分并入库
+            int saveChunkCount = 0;
+            for (LiteParseService.ParsePage page : pages) {
+                if (page.getText() == null || page.getText().isBlank()) {
+                    continue;
+                }
+
+                // 打印 LiteParse 还原处理的文本结果
+                logger.info(">>> 第 {} 页解析结果：\n{}", page.getPageNumber(), page.getText());
+
+                // 复用原有的切片逻辑
+                List<String> childChunks = splitTextIntoChunksWithSemantics(page.getText(), chunkSize);
+
+                // 改造原有的 saveChildChunks，让它能接收 pageNumber
+                saveChunkCount = saveChildChunks(fileMd5, childChunks, userId, orgTag, isPublic, saveChunkCount, page.getPageNumber());
+            }
+        } finally {
+            Files.deleteIfExists(tempPdf);
+        }
+
+    }
+
+    /**
+     * 修该原有的saveChildChunks方法，增加PageNumber参数
+     */
+    private int saveChildChunks(String fileMd5, List<String> childChunks, String userId,
+                                String orgTag, boolean isPublic, int saveChunkCount, Integer pageNumber) {
+
+        int currentChunkId = saveChunkCount;
+        for (String chunk : childChunks) {
+            currentChunkId++;
+            var vector = new DocumentVector();
+            vector.setFileMd5(fileMd5);
+            vector.setChunkId(currentChunkId);
+            vector.setTextContent(chunk);
+            vector.setUserId(userId);
+            vector.setOrgTag(orgTag);
+            vector.setPublic(isPublic);
+            vector.setPageNumber(pageNumber);
+            documentVectorRepository.save(vector);
+        }
+        logger.info("成功保存 {} 个子切片到数据库", childChunks.size());
+        return currentChunkId;
+    }
+
+    /**
      * 检查内存是否达到阈值
      * 该方法用于监控系统内存使用情况，当内存使用达到预设阈值时触发相应的处理逻辑
      */
@@ -108,7 +191,7 @@ public class ParseService {
         double memoryUsage = (double) usedMemory / maxMemory;
         
         if (memoryUsage > maxMemoryThreshold) {
-            logger.warn("内存使用率过高: {:.2f}%, 触发垃圾回收", memoryUsage * 100);
+            logger.warn("内存使用率过高: {}%, 触发垃圾回收", String.format("%.2f",memoryUsage * 100));
             System.gc();
             
             // 重新检查

@@ -63,8 +63,11 @@ public class SecurityConfig {
                             .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                             // 用户组织标签管理接口
                             .requestMatchers("/api/v1/users/primary-org").hasAnyRole("USER", "ADMIN")
+                            // 新增 放行内部 OCR 接口
+                            .requestMatchers("/api/v1/internal/ocr/**").permitAll()
                             // 其他请求需要认证
                             .anyRequest().authenticated())
+
                     // 配置会话管理策略
                     // 设置会话创建策略为STATELESS，表示不会创建会话，通常用于无状态的API应用
                     .sessionManagement(session -> session
